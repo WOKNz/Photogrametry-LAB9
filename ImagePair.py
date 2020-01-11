@@ -1,11 +1,13 @@
-from Camera import Camera
-from SingleImage import SingleImage
-from MatrixMethods import Compute3DRotationMatrix, Compute3DRotationDerivativeMatrix, ComputeSkewMatrixFromVector
 import numpy as np
 import numpy.linalg as la
-import matplotlib.pyplot as plt
+
 import PhotoViewer as photo
-#import pandas as pd
+from Camera import Camera
+from MatrixMethods import Compute3DRotationMatrix, Compute3DRotationDerivativeMatrix, ComputeSkewMatrixFromVector
+from SingleImage import SingleImage
+
+
+# import pandas as pd
 
 class ImagePair(object):
 
@@ -501,6 +503,40 @@ class ImagePair(object):
         ax.view_init(20, 80)
 
         return fig, ax
+
+    def vec2mat(self, v):
+        return np.array([[0, -v[2, 0], v[1, 0]], [v[2, 0], 0, -v[0, 0]], [-v[1, 0], v[0, 0], 0]])
+
+    def RotationLevelModel(self, constrain1, constrain2):
+        """
+        Function that calculates Rotation Matrix
+        :param constrain1: First axis vector
+        :param constrain2: Second Axis vector
+        :return: Rotation Matrix (3X3)
+        """
+        if la.norm(constrain1[1]) != 1 or la.norm(constrain2[1]) != 1:
+            x = (constrain1[1] / la.norm(constrain1[1])).reshape(3, 1)
+            z = (constrain2[1] / la.norm(constrain2[1])).reshape(3, 1)
+
+        if constrain1[0] == constrain2[0]:
+            return np.diag(np.ones(1, 3))
+
+        y = np.dot(self.vec2mat(z), x) / \
+            la.norm(np.dot(self.vec2mat(z), x))
+
+        return np.hstack((x, y, z))
+
+    def ModelTransformation(self, modelPoints, scale, rotationMatrix):
+        """
+        Calculating rotated and scaled points (I had to add rotation matrix since none of the objects hold world points)
+        :param modelPoints: points in model system
+        :param scale:  Scale factor from model to ground
+        :param rotationMatrix: rotaion matrix from model to ground
+        :return: nd.array (nx3)
+        """
+
+        return (np.dot(rotationMatrix, modelPoints.T) * scale).T
+
 
 if __name__ == '__main__':
     camera = Camera(152, None, None, None, None)

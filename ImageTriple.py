@@ -1,10 +1,11 @@
-import numpy as np
-from ImagePair import ImagePair
-from SingleImage import SingleImage
-from Camera import Camera
-import PhotoViewer as photo
 import matplotlib.pyplot as plt
-from MatrixMethods import Compute3DRotationMatrix, Compute3DRotationDerivativeMatrix, ComputeSkewMatrixFromVector
+import numpy as np
+
+from Camera import Camera
+from ImagePair import ImagePair
+from MatrixMethods import Compute3DRotationMatrix
+from SingleImage import SingleImage
+
 
 class ImageTriple(object):
     def __init__(self, imagePair1, imagePair2):
@@ -163,10 +164,6 @@ class ImageTriple(object):
         fig, ax = imagePair2.drawImagePair(imagePair2, modelPoints2,fig1,ax1)
 
         plt.show()
-
-
-        print('Debug me please!')
-
 
 if __name__ == '__main__':
     camera = Camera(152, None, None, None, None)
